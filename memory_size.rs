@@ -1,28 +1,39 @@
+use std::ops::{Add, AddAssign};
 
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct MemorySize {
-    size_bits: i32
+    size_bits: usize
 }
 
 impl MemorySize {
     /**
-     * construct a memory size from a number of bytes
+     * Creates a MemorySize with a size of 0
      */
-    pub fn from_bytes(bytes: i32) -> MemorySize{
+    pub fn new() -> MemorySize {
+        MemorySize{
+            size_bits: 0
+        }
+    }
+    /**
+     * Construct a MemorySize from a number of bytes
+     */
+    pub fn from_bytes(bytes: usize) -> MemorySize{
         MemorySize{
             size_bits: bytes*8
         }
     }
     /**
-     * construct a memory size from number of bits
+     * Construct a MemorySize from number of bits
      */
-    pub fn from_bits(bits: i32) -> MemorySize{
+    pub fn from_bits(bits: usize) -> MemorySize{
         MemorySize{
             size_bits:bits
         }
     }
 
     /**
-     * calculate the size suggested by this MemorySize in bytes
+     * Calculate the size suggested by this MemorySize in bytes
      */
     pub fn size_bytes(&self) -> usize{
         let rounded_down_ans = self.size_bits/8;
@@ -37,10 +48,25 @@ impl MemorySize {
     }
 
     /**
-     * calculate the size suggested by this MemorySize in bits
+     * Calculate the size suggested by this MemorySize in bits
      */
     pub fn size_bits(&self) -> usize{
         self.size_bits
     }
 
+}
+
+impl AddAssign for MemorySize{
+    fn add_assign(&mut self, rhs: Self) {
+        self.size_bits += rhs.size_bits;
+    }
+}
+impl Add for MemorySize{
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self{
+            size_bits: self.size_bits+rhs.size_bits,
+        }
+    }
 }
