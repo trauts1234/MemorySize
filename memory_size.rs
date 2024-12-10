@@ -4,49 +4,31 @@ use std::ops::{Add, AddAssign};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct MemoryLayout {
-    positive: bool,//whether this is a positive size, or perhaps a negative offset
     size_bits: isize
 }
 
 impl MemoryLayout {
-    pub fn safe_cast_to_unsigned(x: isize) -> usize {
-        if x.is_negative() {
-            panic!("tried to cast negative number to unsigned")
-        } else{
-            x as usize
-        }
-    }
-    pub fn safe_cast_to_signed(x: usize) -> isize{
-        if x > isize::MAX.try_into().unwrap() {
-            panic!("tried to cast too large number to signed")
-        } else {
-            x as isize
-        }
-    }
     /**
      * Creates a MemorySize with a size of 0
      */
-    pub fn new() -> MemoryLayout {
+    pub const fn new() -> MemoryLayout {
         MemoryLayout{
-            positive: true,
             size_bits: 0
         }
     }
     /**
      * Construct a MemorySize from a number of bytes
      */
-    pub fn from_bytes(bytes: isize) -> MemoryLayout{
+    pub const fn from_bytes(bytes: isize) -> MemoryLayout{
         MemoryLayout{
-            positive: true,
             size_bits: bytes*8
         }
     }
     /**
      * Construct a MemorySize from number of bits
      */
-    pub fn from_bits(bits: isize) -> MemoryLayout{
+    pub const fn from_bits(bits: isize) -> MemoryLayout{
         MemoryLayout{
-            positive: true,
             size_bits:bits
         }
     }
@@ -73,21 +55,44 @@ impl MemoryLayout {
         self.size_bits
     }
 
+    pub fn increment_by(&mut self, rhs: &MemoryLayout){
+        self.size_bits += rhs.size_bits;
+    }
+
+
 }
 
-impl Add for MemoryLayout{
-    type Output = Self;
+impl MemoryLayout {
+    /**
+     * Adds the memory size of the paramaters
+     */
+    pub fn add(lhs: &MemoryLayout, rhs: &MemoryLayout) -> MemoryLayout{
+        if lhs.size_bits.is_negative() || rhs.size_bits.is_negative(){
+            panic!("tried to add memory sizes, with one arg being a negative size")
+        }
+        MemoryLayout::from_bits(lhs.size_bits+rhs.size_bits)
+    }
+    /**
+     * Calculates a memory size with -original number of bits
+     * i.e 64 bit becomes -64 bit
+     * This is used for offsets where the offset may need to be negative
+     */
+    pub fn negate(lhs: &MemoryLayout) -> MemoryLayout{
+        MemoryLayout::from_bits(-lhs.size_bits)
+    }
 
-    fn add(self, rhs: Self) -> Self::Output {
-        Self{
-            positive: true,
-            size_bits: self.size_bits+rhs.size_bits,
+    pub fn safe_cast_to_unsigned(x: isize) -> usize {
+        if x.is_negative() {
+            panic!("tried to cast negative number to unsigned")
+        } else{
+            x as usize
         }
     }
-}
-
-impl AddAssign for MemoryLayout{
-    fn add_assign(&mut self, rhs: Self) {
-        self.size_bits = self.size_bits + rhs.size_bits;
+    pub fn safe_cast_to_signed(x: usize) -> isize{
+        if x > isize::MAX.try_into().unwrap() {
+            panic!("tried to cast too large number to signed")
+        } else {
+            x as isize
+        }
     }
 }
