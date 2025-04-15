@@ -10,7 +10,7 @@ license = "GPL-3.0-or-later"
 
 [dependencies]
 humansize = "*"
-derive_more = { version = "*", features = ["add", "add_assign", "sum"] }
+derive_more = { version = "2.0.1", features = ["add", "add_assign", "sum"] }
 
 
 [lib]
