@@ -44,6 +44,16 @@ impl MemorySize {
     }
 
     /**
+     * Constructs a MemorySize from a number of bits
+     * The resultant MemorySize represents at least enough bytes to store all the bits
+     */
+    pub const fn from_bits_ceil(bits: usize) -> MemorySize {
+        MemorySize {
+            size_bytes: bits.div_ceil(8)
+        }
+    }
+
+    /**
      * Calculate the size suggested by this MemorySize in bytes
      */
     pub fn size_bytes(&self) -> usize{
@@ -55,12 +65,14 @@ impl MemorySize {
      * if the size represented is bigger than usize::MAX bits, then None is returned
      */
     pub fn size_bits(&self) -> Option<usize> {
-        const MAX_BYTES_STILL_FIT_IN_BITS: usize = usize::MAX / BITS_IN_BYTE;
-        if self.size_bytes <= MAX_BYTES_STILL_FIT_IN_BITS {
-            Some(self.size_bytes * 8)
-        } else {
-            None
-        }
+        self.size_bytes.checked_mul(8)
+    }
+    /**
+     * Calculates the size represented by this MemorySize in bits
+     * if the size is > usize::MAX bits, then multiplication is wrapped
+     */
+    pub fn size_bits_unchecked(&self) -> usize {
+        self.size_bytes.wrapping_mul(8)
     }
 
 }

@@ -275,3 +275,34 @@ fn debug_format() {
     let layout = MemorySize::from_bytes(usize::MAX); // Maximum size
     assert_eq!(format!("{:?}", layout), format!("MemorySize {{ size_bytes: {} }}", usize::MAX));
 }
+
+#[test]
+fn from_bits_ceil() {
+    let x = MemorySize::from_bits_ceil(0);
+    assert_eq!(x.size_bytes(), 0);
+
+    let y = MemorySize::from_bits_ceil(1); // 1 bit requires 1 byte
+    assert_eq!(y.size_bytes(), 1);
+
+    let z = MemorySize::from_bits_ceil(15); // 15 bits require 2 bytes
+    assert_eq!(z.size_bytes(), 2);
+
+    let large_bits = usize::MAX - 7; // Largest number of bits fitting into usize
+    let large = MemorySize::from_bits_ceil(large_bits);
+    assert_eq!(large.size_bytes(), (large_bits + 7) / 8); // Ceiling division
+}
+
+#[test]
+fn size_bits_unchecked() {
+    let x = MemorySize::from_bytes(0);
+    assert_eq!(x.size_bits_unchecked(), 0);
+
+    let y = MemorySize::from_bytes(1);
+    assert_eq!(y.size_bits_unchecked(), 8);
+
+    let z = MemorySize::from_bytes(usize::MAX / 8); // Maximum bytes that won't overflow bits
+    assert_eq!(z.size_bits_unchecked(), usize::MAX - 7);
+
+    let wrapped = MemorySize::from_bytes(usize::MAX); // This will wrap
+    assert_eq!(wrapped.size_bits_unchecked(), usize::MAX.wrapping_mul(8));
+}
