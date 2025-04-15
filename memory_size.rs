@@ -2,7 +2,7 @@ mod tests;
 
 use std::{fmt::Display, iter::Sum, ops::{Add, AddAssign, Sub, SubAssign}};
 
-use humansize::{format_size, BaseUnit, FormatSizeOptions};
+use humansize::{format_size, BaseUnit, FormatSizeOptions, Kilo};
 
 const BITS_IN_BYTE: usize = 8;
 
@@ -181,7 +181,9 @@ impl Display for MemoryLayout {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let options = FormatSizeOptions::default()
             .base_unit(BaseUnit::Byte)
-            .decimal_places(2);
+            .kilo(Kilo::Binary)
+            .decimal_places(2)
+            .space_after_value(true);
         write!(f, "{}", format_size(self.size_bytes(), options))
     }
 }
