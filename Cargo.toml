@@ -2,6 +2,10 @@
 name = "memory_size"
 version = "0.1.0"
 edition = "2021"
+description = "A crate with the ability to represent a number of bits or bytes, and apply arithmetic to the sizes"
+readme = "README.MD"
+repository = "https://github.com/trauts1234/MemorySize"
+keywords = ["memory-management"]
 
 [dependencies]
 humansize = "*"
