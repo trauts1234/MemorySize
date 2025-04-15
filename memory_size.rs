@@ -7,35 +7,35 @@ use humansize::{format_size, BaseUnit, FormatSizeOptions, Kilo};
 const BITS_IN_BYTE: usize = 8;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
-pub struct MemoryLayout {
+pub struct MemorySize {
     size_bytes: usize
 }
 
-impl MemoryLayout {
+impl MemorySize {
     /**
-     * Creates a MemoryLayout with a size of 0
+     * Creates a MemorySize with a size of 0
      */
-    pub const fn new() -> MemoryLayout {
-        MemoryLayout{
+    pub const fn new() -> MemorySize {
+        MemorySize{
             size_bytes: 0
         }
     }
     /**
-     * Construct a MemoryLayout from a number of bytes
+     * Construct a MemorySize from a number of bytes
      */
-    pub const fn from_bytes(size_bytes: usize) -> MemoryLayout{
-        MemoryLayout{
+    pub const fn from_bytes(size_bytes: usize) -> MemorySize{
+        MemorySize{
             size_bytes
         }
     }
     /**
-     * Construct a MemoryLayout from number of bits
+     * Construct a MemorySize from number of bits
      * assuming 8 bit bytes
-     * returns None if the number of bits does not exactly fit a number of bytes, else an owned MemoryLayout representing the size
+     * returns None if the number of bits does not exactly fit a number of bytes, else an owned MemorySize representing the size
      */
-    pub const fn from_bits(bits: usize) -> Option<MemoryLayout> {
+    pub const fn from_bits(bits: usize) -> Option<MemorySize> {
         if bits % BITS_IN_BYTE == 0 {
-            Some(MemoryLayout {
+            Some(MemorySize {
                 size_bytes: bits/BITS_IN_BYTE
             })
         } else {
@@ -44,14 +44,14 @@ impl MemoryLayout {
     }
 
     /**
-     * Calculate the size suggested by this MemoryLayout in bytes
+     * Calculate the size suggested by this MemorySize in bytes
      */
     pub fn size_bytes(&self) -> usize{
         self.size_bytes
     }
 
     /**
-     * Calculate the size suggested by this MemoryLayout in bits
+     * Calculate the size suggested by this MemorySize in bits
      * if the size represented is bigger than usize::MAX bits, then None is returned
      */
     pub fn size_bits(&self) -> Option<usize> {
@@ -65,66 +65,66 @@ impl MemoryLayout {
 
 }
 
-impl Add for MemoryLayout {
-    type Output = MemoryLayout;
+impl Add for MemorySize {
+    type Output = MemorySize;
 
     /**
      * adds the size in bytes under the hood
      * so may panic!() on overflow only on debug builds
      */
-    fn add(self, rhs: MemoryLayout) -> MemoryLayout {
+    fn add(self, rhs: MemorySize) -> MemorySize {
         
-        MemoryLayout::from_bytes(
-            self.size_bytes.checked_add(rhs.size_bytes).expect("addition of MemoryLayout overflowed")
+        MemorySize::from_bytes(
+            self.size_bytes.checked_add(rhs.size_bytes).expect("addition of MemorySize overflowed")
         )
     }
 }
 
-impl AddAssign for MemoryLayout {
+impl AddAssign for MemorySize {
     /**
      * adds the size in bytes under the hood
      * so may panic!() on overflow only on debug builds
      */
-    fn add_assign(&mut self, rhs: MemoryLayout) {
-        self.size_bytes = self.size_bytes.checked_add(rhs.size_bytes).expect("addition-assignment of MemoryLayout overflowed");
+    fn add_assign(&mut self, rhs: MemorySize) {
+        self.size_bytes = self.size_bytes.checked_add(rhs.size_bytes).expect("addition-assignment of MemorySize overflowed");
     }
 }
 
-impl Sub for MemoryLayout {
-    type Output = MemoryLayout;
+impl Sub for MemorySize {
+    type Output = MemorySize;
 
     /**
      * subtracts the size in bytes under the hood
      * so may panic!() on underflow only on debug builds
      */
-    fn sub(self, rhs: MemoryLayout) -> MemoryLayout {
-        MemoryLayout::from_bytes(
-            self.size_bytes.checked_sub(rhs.size_bytes).expect("subtraction of MemoryLayout underflowed")
+    fn sub(self, rhs: MemorySize) -> MemorySize {
+        MemorySize::from_bytes(
+            self.size_bytes.checked_sub(rhs.size_bytes).expect("subtraction of MemorySize underflowed")
         )
     }
 }
 
-impl SubAssign for MemoryLayout {
+impl SubAssign for MemorySize {
     /**
      * subtracts the size in bytes under the hood
      * so may panic!() on underflow only on debug builds
      */
-    fn sub_assign(&mut self, rhs: MemoryLayout) {
-        self.size_bytes = self.size_bytes.checked_sub(rhs.size_bytes).expect("subtraction-assignment of MemoryLayout underflowed");
+    fn sub_assign(&mut self, rhs: MemorySize) {
+        self.size_bytes = self.size_bytes.checked_sub(rhs.size_bytes).expect("subtraction-assignment of MemorySize underflowed");
     }
 }
-impl Sum for MemoryLayout {
+impl Sum for MemorySize {
     /**
-     * finds the total size represented by the MemoryLayouts in the iterator
+     * finds the total size represented by the MemorySizes in the iterator
      * panics:
      * if the sum overflows
      */
     fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
-        iter.fold(MemoryLayout::new(), |acc, x| acc + x)
+        iter.fold(MemorySize::new(), |acc, x| acc + x)
     }
 }
 
-impl PartialOrd for MemoryLayout {
+impl PartialOrd for MemorySize {
     /**
      * compares the size of each memory layout's size in bytes
      */
@@ -132,13 +132,13 @@ impl PartialOrd for MemoryLayout {
         self.size_bytes.partial_cmp(&other.size_bytes)
     }
 }
-impl Ord for MemoryLayout {
+impl Ord for MemorySize {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.size_bytes.cmp(&other.size_bytes)
     }
     
     /**
-     * returns the largest size represented by the two MemoryLayouts
+     * returns the largest size represented by the two MemorySizes
      */
     fn max(self, other: Self) -> Self
     where
@@ -148,7 +148,7 @@ impl Ord for MemoryLayout {
     }
     
     /**
-     * returns the smallest size represented by the two MemoryLayouts
+     * returns the smallest size represented by the two MemorySizes
      */
     fn min(self, other: Self) -> Self
     where
@@ -167,15 +167,15 @@ impl Ord for MemoryLayout {
         Self: Sized,
     {
         assert!(min <= max);
-        MemoryLayout {
+        MemorySize {
             size_bytes: self.size_bytes.clamp(min.size_bytes, max.size_bytes)
         }
     }
 }
 
-impl Display for MemoryLayout {
+impl Display for MemorySize {
     /**
-     * pretty-prints the MemoryLayout
+     * pretty-prints the MemorySize
      * uses human-readable formats, like 10GB, 100B
      */
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
