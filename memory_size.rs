@@ -73,7 +73,10 @@ impl Add for MemoryLayout {
      * so may panic!() on overflow only on debug builds
      */
     fn add(self, rhs: MemoryLayout) -> MemoryLayout {
-        MemoryLayout::from_bytes(self.size_bytes+rhs.size_bytes)
+        
+        MemoryLayout::from_bytes(
+            self.size_bytes.checked_add(rhs.size_bytes).expect("addition of MemoryLayout overflowed")
+        )
     }
 }
 
@@ -83,7 +86,7 @@ impl AddAssign for MemoryLayout {
      * so may panic!() on overflow only on debug builds
      */
     fn add_assign(&mut self, rhs: MemoryLayout) {
-        self.size_bytes += rhs.size_bytes;
+        self.size_bytes = self.size_bytes.checked_add(rhs.size_bytes).expect("addition-assignment of MemoryLayout overflowed");
     }
 }
 
@@ -95,7 +98,9 @@ impl Sub for MemoryLayout {
      * so may panic!() on underflow only on debug builds
      */
     fn sub(self, rhs: MemoryLayout) -> MemoryLayout {
-        MemoryLayout::from_bytes(self.size_bytes-rhs.size_bytes)
+        MemoryLayout::from_bytes(
+            self.size_bytes.checked_sub(rhs.size_bytes).expect("subtraction of MemoryLayout underflowed")
+        )
     }
 }
 
@@ -105,12 +110,14 @@ impl SubAssign for MemoryLayout {
      * so may panic!() on underflow only on debug builds
      */
     fn sub_assign(&mut self, rhs: MemoryLayout) {
-        self.size_bytes -= rhs.size_bytes;
+        self.size_bytes = self.size_bytes.checked_sub(rhs.size_bytes).expect("subtraction-assignment of MemoryLayout underflowed");
     }
 }
 impl Sum for MemoryLayout {
     /**
-     * adds all elements of the iterator, using the "Add" trait
+     * finds the total size represented by the MemoryLayouts in the iterator
+     * panics:
+     * if the sum overflows
      */
     fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
         iter.fold(MemoryLayout::new(), |acc, x| acc + x)
@@ -152,6 +159,8 @@ impl Ord for MemoryLayout {
     
     /**
      * clamps the size in bytes to between min.size_bytes() and max.size_bytes()
+     * panics:
+     * if min > max
      */
     fn clamp(self, min: Self, max: Self) -> Self
     where
