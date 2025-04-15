@@ -6,6 +6,7 @@ description = "A crate with the ability to represent a number of bits or bytes, 
 readme = "README.MD"
 repository = "https://github.com/trauts1234/MemorySize"
 keywords = ["memory-management"]
+license = "GPL-3.0-or-later"
 
 [dependencies]
 humansize = "*"
