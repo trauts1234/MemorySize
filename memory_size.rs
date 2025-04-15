@@ -4,75 +4,61 @@ use std::{fmt::Display, iter::Sum, ops::{Add, AddAssign, Sub, SubAssign}};
 
 use humansize::{format_size, BaseUnit, FormatSizeOptions, Kilo};
 
-const BITS_IN_BYTE: usize = 8;
+const BITS_IN_BYTE: u64 = 8;
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub struct MemorySize {
-    size_bytes: usize
+    size_bits: u64
 }
 
 impl MemorySize {
-    /**
-     * Creates a MemorySize with a size of 0
-     */
-    pub const fn new() -> MemorySize {
-        MemorySize{
-            size_bytes: 0
-        }
+    pub const fn new() -> Self {
+        MemorySize { size_bits: 0 }
     }
     /**
      * Construct a MemorySize from a number of bytes
+     * if the number of bytes is greater than u64::MAX bits, then it is limited to u64::MAX bits
      */
-    pub const fn from_bytes(size_bytes: usize) -> MemorySize{
+    pub const fn from_bytes(size_bytes: u64) -> MemorySize{
         MemorySize{
-            size_bytes
+            size_bits: size_bytes.saturating_mul(BITS_IN_BYTE)
         }
     }
     /**
      * Construct a MemorySize from number of bits
-     * assuming 8 bit bytes
-     * returns None if the number of bits does not exactly fit a number of bytes, else an owned MemorySize representing the size
+     * assuming BITS_IN_BYTE bit bytes
      */
-    pub const fn from_bits(bits: usize) -> Option<MemorySize> {
-        if bits % BITS_IN_BYTE == 0 {
-            Some(MemorySize {
-                size_bytes: bits/BITS_IN_BYTE
-            })
-        } else {
-            None
+    pub const fn from_bits(size_bits: u64) -> MemorySize {
+        MemorySize {
+            size_bits
         }
     }
 
     /**
      * Constructs a MemorySize from a number of bits
-     * The resultant MemorySize represents at least enough bytes to store all the bits
+     * The resultant MemorySize represents a whole number of bytes, at least enough bytes to store all the bits
      */
-    pub const fn from_bits_ceil(bits: usize) -> MemorySize {
+    pub const fn from_bits_ceil(bits: u64) -> MemorySize {
         MemorySize {
-            size_bytes: bits.div_ceil(8)
+            size_bits: bits.div_ceil(BITS_IN_BYTE) * BITS_IN_BYTE
         }
     }
 
     /**
      * Calculate the size suggested by this MemorySize in bytes
+     * panics if the number of bits represented is not a multiple of BITS_IN_BYTE
      */
-    pub fn size_bytes(&self) -> usize{
-        self.size_bytes
+    pub fn size_bytes(&self) -> u64 {
+        assert!(self.size_bits % BITS_IN_BYTE == 0);
+        self.size_bits / BITS_IN_BYTE
     }
 
     /**
      * Calculate the size suggested by this MemorySize in bits
      * if the size represented is bigger than usize::MAX bits, then None is returned
      */
-    pub fn size_bits(&self) -> Option<usize> {
-        self.size_bytes.checked_mul(8)
-    }
-    /**
-     * Calculates the size represented by this MemorySize in bits
-     * if the size is > usize::MAX bits, then multiplication is wrapped
-     */
-    pub fn size_bits_unchecked(&self) -> usize {
-        self.size_bytes.wrapping_mul(8)
+    pub fn size_bits(&self) -> u64 {
+        self.size_bits
     }
 
 }
@@ -86,19 +72,20 @@ impl Add for MemorySize {
      */
     fn add(self, rhs: MemorySize) -> MemorySize {
         
-        MemorySize::from_bytes(
-            self.size_bytes.checked_add(rhs.size_bytes).expect("addition of MemorySize overflowed")
+        MemorySize::from_bits(
+            self.size_bits.checked_add(rhs.size_bits).expect("addition of MemorySize overflowed")
         )
     }
 }
 
 impl AddAssign for MemorySize {
     /**
-     * adds the size in bytes under the hood
-     * so may panic!() on overflow only on debug builds
+     * finds the total size of self and rhs
+     * panics if:
+     * size_bits + rhs.size_bits > u64::MAX
      */
     fn add_assign(&mut self, rhs: MemorySize) {
-        self.size_bytes = self.size_bytes.checked_add(rhs.size_bytes).expect("addition-assignment of MemorySize overflowed");
+        self.size_bits = self.size_bits.checked_add(rhs.size_bits).expect("addition-assignment of MemorySize overflowed");
     }
 }
 
@@ -106,23 +93,25 @@ impl Sub for MemorySize {
     type Output = MemorySize;
 
     /**
-     * subtracts the size in bytes under the hood
-     * so may panic!() on underflow only on debug builds
+     * finds the differences in size represented by self and rhs
+     * panics if:
+     * size_bits - rhs.size_bits < 0
      */
     fn sub(self, rhs: MemorySize) -> MemorySize {
-        MemorySize::from_bytes(
-            self.size_bytes.checked_sub(rhs.size_bytes).expect("subtraction of MemorySize underflowed")
+        MemorySize::from_bits(
+            self.size_bits.checked_sub(rhs.size_bits).expect("subtraction of MemorySize underflowed")
         )
     }
 }
 
 impl SubAssign for MemorySize {
     /**
-     * subtracts the size in bytes under the hood
-     * so may panic!() on underflow only on debug builds
+     * finds the differences in size represented by self and rhs
+     * panics if:
+     * size_bits - rhs.size_bits < 0
      */
     fn sub_assign(&mut self, rhs: MemorySize) {
-        self.size_bytes = self.size_bytes.checked_sub(rhs.size_bytes).expect("subtraction-assignment of MemorySize underflowed");
+        self.size_bits = self.size_bits.checked_sub(rhs.size_bits).expect("subtraction-assignment of MemorySize underflowed");
     }
 }
 impl Sum for MemorySize {
@@ -141,12 +130,12 @@ impl PartialOrd for MemorySize {
      * compares the size of each memory layout's size in bytes
      */
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.size_bytes.partial_cmp(&other.size_bytes)
+        self.size_bits.partial_cmp(&other.size_bits)
     }
 }
 impl Ord for MemorySize {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.size_bytes.cmp(&other.size_bytes)
+        self.size_bits.cmp(&other.size_bits)
     }
     
     /**
@@ -180,7 +169,7 @@ impl Ord for MemorySize {
     {
         assert!(min <= max);
         MemorySize {
-            size_bytes: self.size_bytes.clamp(min.size_bytes, max.size_bytes)
+            size_bits: self.size_bits.clamp(min.size_bits, max.size_bits)
         }
     }
 }

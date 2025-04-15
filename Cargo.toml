@@ -10,6 +10,8 @@ license = "GPL-3.0-or-later"
 
 [dependencies]
 humansize = "*"
+derive_more = { version = "*", features = ["add"] }
+
 
 [lib]
 path = "memory_size.rs"
