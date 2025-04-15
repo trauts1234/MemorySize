@@ -9,7 +9,7 @@ keywords = ["memory-management"]
 license = "GPL-3.0-or-later"
 
 [dependencies]
-humansize = "*"
+humansize = "2.1.3"
 derive_more = { version = "2.0.1", features = ["add", "add_assign", "sum"] }
 
 
