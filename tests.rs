@@ -283,3 +283,9 @@ fn from_bits_ceil() {
     let large = MemorySize::from_bits_ceil(large_bits);
     assert_eq!(large.size_bytes(), (large_bits + 7) / 8); // Ceiling division
 }
+
+#[test]
+fn test_default() {
+    let x = MemorySize::default();
+    assert_eq!(x.size_bits(), 0);
+}

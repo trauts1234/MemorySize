@@ -25,7 +25,7 @@ const BITS_IN_BYTE: u64 = 8;
 /// The maximum size possible to be represented is u64::MAX bits (approximately 2.3 exabytes)
 #[derive(
     PartialEq, PartialOrd, Ord, Eq,
-    Clone, Copy, Hash, Debug,
+    Clone, Copy, Hash, Debug, Default,
     Add, Sub, Sum, AddAssign, SubAssign
 )]
 pub struct MemorySize {
