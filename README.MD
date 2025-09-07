@@ -10,6 +10,7 @@
 - Pretty-print memory sizes in human-readable formats (e.g. `10 kB`, `1 GB`).
 - Clamp, find the maximum, or find the minimum of memory sizes.
 - Sum memory sizes from iterators.
+- Align memory offsets
 
 ### Example
 

@@ -136,6 +136,30 @@ impl MemorySize {
         self.size_bits
     }
 
+    /// Calculates the memory size above or equal to `self` that is aligned to `alignment`
+    /// 
+    /// i.e returned value is a multiple of alignment
+    /// 
+    /// # Examples
+    ///
+    /// ```
+    /// use memory_size::MemorySize;
+    ///
+    /// let size = MemorySize::from_bytes(25);
+    /// assert_eq!(size.align_up(&MemorySize::from_bytes(4)), MemorySize::from_bytes(28));
+    /// ```
+    pub fn align_up(&self, alignment: &MemorySize) -> MemorySize {
+        //address 0 is aligned to everything
+        if self.size_bits == 0 {return self.clone();}
+        // alignment 0 = no alignment
+        if alignment.size_bits == 0 {return self.clone();}
+
+        let too_much = self.size_bits + alignment.size_bits - 1;//go above self
+        let size_bits = (too_much / alignment.size_bits) * alignment.size_bits;//round down
+
+        Self { size_bits }
+    }
+
 }
 
 impl Display for MemorySize {

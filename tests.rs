@@ -289,3 +289,25 @@ fn test_default() {
     let x = MemorySize::default();
     assert_eq!(x.size_bits(), 0);
 }
+
+#[test]
+fn test_align_up() {
+    let edge_cases: Vec<_> = 
+        [0,1,8,64,67].into_iter()
+        .map(|x| MemorySize::from_bits(x))
+        .collect();
+
+    let x = MemorySize::from_bits(67*64);
+    for case in &edge_cases {
+        assert_eq!(MemorySize::new().align_up(case), MemorySize::new());//offset 0 should be aligned to everything
+
+        assert_eq!(case.align_up(&MemorySize::new()), *case);//everything should be aligned to alignment 0
+        assert_eq!(case.align_up(&MemorySize::from_bits(1)), *case);//and 1 bit aligned
+
+        assert_eq!(case.align_up(case), *case);//everything should be aligned to itself
+
+        assert_eq!(x.align_up(case), x);// x is aligned already
+    }
+
+    assert_eq!(MemorySize::from_bytes(12).align_up(&MemorySize::from_bytes(16)), MemorySize::from_bytes(16));
+}
