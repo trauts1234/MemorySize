@@ -298,16 +298,16 @@ fn test_align_up() {
         .collect();
 
     let x = MemorySize::from_bits(67*64);
-    for case in &edge_cases {
+    for case in edge_cases {
         assert_eq!(MemorySize::new().align_up(case), MemorySize::new());//offset 0 should be aligned to everything
 
-        assert_eq!(case.align_up(&MemorySize::new()), *case);//everything should be aligned to alignment 0
-        assert_eq!(case.align_up(&MemorySize::from_bits(1)), *case);//and 1 bit aligned
+        assert_eq!(case.align_up(MemorySize::new()), case);//everything should be aligned to alignment 0
+        assert_eq!(case.align_up(MemorySize::from_bits(1)), case);//and 1 bit aligned
 
-        assert_eq!(case.align_up(case), *case);//everything should be aligned to itself
+        assert_eq!(case.align_up(case), case);//everything should be aligned to itself
 
         assert_eq!(x.align_up(case), x);// x is aligned already
     }
 
-    assert_eq!(MemorySize::from_bytes(12).align_up(&MemorySize::from_bytes(16)), MemorySize::from_bytes(16));
+    assert_eq!(MemorySize::from_bytes(12).align_up(MemorySize::from_bytes(16)), MemorySize::from_bytes(16));
 }

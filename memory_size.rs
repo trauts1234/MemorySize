@@ -148,7 +148,7 @@ impl MemorySize {
     /// let size = MemorySize::from_bytes(25);
     /// assert_eq!(size.align_up(&MemorySize::from_bytes(4)), MemorySize::from_bytes(28));
     /// ```
-    pub fn align_up(&self, alignment: &MemorySize) -> MemorySize {
+    pub fn align_up(&self, alignment: MemorySize) -> MemorySize {
         //address 0 is aligned to everything
         if self.size_bits == 0 {return self.clone();}
         // alignment 0 = no alignment
