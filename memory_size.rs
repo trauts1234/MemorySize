@@ -160,6 +160,21 @@ impl MemorySize {
         Self { size_bits }
     }
 
+    /// Calculates the minimum number of bytes that can store `&self`
+    /// 
+    /// under the hood, this calls `self.align_up(MemorySize::from_bytes(1))`
+    /// 
+    /// # Examples 
+    /// ```
+    /// use memory_size::MemorySize;
+    ///
+    /// let size = MemorySize::from_bits(12);
+    /// assert_eq!(size.round_up_byte(), MemorySize::from_bytes(2));
+    /// ```
+    pub fn round_up_byte(&self) -> MemorySize {
+        self.align_up(MemorySize::from_bytes(1))
+    }
+
 }
 
 impl Display for MemorySize {

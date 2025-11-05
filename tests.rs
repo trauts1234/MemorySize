@@ -311,3 +311,10 @@ fn test_align_up() {
 
     assert_eq!(MemorySize::from_bytes(12).align_up(MemorySize::from_bytes(16)), MemorySize::from_bytes(16));
 }
+
+#[test]
+fn test_round_up_byte() {
+    assert_eq!(MemorySize::new().round_up_byte(), MemorySize::new());
+
+    assert_eq!(MemorySize::from_bytes(3).round_up_byte(), MemorySize::from_bytes(3));
+}
