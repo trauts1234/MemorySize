@@ -1,6 +1,6 @@
 [package]
 name = "memory_size"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 description = "A crate with the ability to represent a number of bits or bytes, and apply arithmetic to the sizes"
 readme = "README.MD"
@@ -9,7 +9,6 @@ keywords = ["memory-management"]
 license = "GPL-3.0-or-later"
 
 [dependencies]
-humansize = "2.1.3"
 derive_more = { version = "2.0.1", features = ["add", "add_assign", "sum"] }
 
 

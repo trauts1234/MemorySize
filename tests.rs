@@ -241,19 +241,13 @@ fn subtract_assign_panic() {
 #[test]
 fn display_format() {
     let layout = MemorySize::from_bytes(1024); // 1 KB
-    assert_eq!(format!("{}", layout), "1 kB");
+    assert_eq!(format!("{}", layout), "8192bit");
 
-    let layout = MemorySize::from_bytes(1048576); // 1 MB
-    assert_eq!(format!("{}", layout), "1 MB");
-
-    let layout = MemorySize::from_bytes(1073741824); // 1 GB
-    assert_eq!(format!("{}", layout), "1 GB");
-
-    let layout = MemorySize::from_bytes(10); // 10 Bytes
-    assert_eq!(format!("{}", layout), "10 B");
+    let layout = MemorySize::from_bits(9);
+    assert_eq!(layout.to_string(), "9bit");
 
     let layout = MemorySize::from_bytes(0); // 0 Bytes
-    assert_eq!(format!("{}", layout), "0 B");
+    assert_eq!(format!("{}", layout), "0bit");
 }
 
 #[test]

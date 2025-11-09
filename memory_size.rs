@@ -17,8 +17,6 @@ mod tests;
 use std::fmt::Display;
 
 use derive_more::{Add, Sub, Sum, AddAssign, SubAssign};
-use humansize::{format_size, BaseUnit, FormatSizeOptions, Kilo};
-
 const BITS_IN_BYTE: u64 = 8;
 
 ///This struct represents the size of an area of memory
@@ -188,15 +186,10 @@ impl Display for MemorySize {
     /// ```
     /// use memory_size::MemorySize;
     ///
-    /// let size = MemorySize::from_bytes(1024);
-    /// println!("{}", size); // e.g. "1 KB"
+    /// let size = MemorySize::from_bits(64);
+    /// println!("{}", size); // e.g. "64bit"
     /// ```
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let options = FormatSizeOptions::default()
-            .base_unit(BaseUnit::Byte)
-            .kilo(Kilo::Binary)
-            .decimal_places(2)
-            .space_after_value(true);
-        write!(f, "{}", format_size(self.size_bytes(), options))
+        write!(f, "{}bit", self.size_bits())
     }
 }
