@@ -134,6 +134,20 @@ impl MemorySize {
         self.size_bits
     }
 
+    /// Calculates the size in numbers of bits and bytes
+    /// 
+    /// # Examples
+    ///
+    /// ```
+    /// use memory_size::MemorySize;
+    ///
+    /// let size = MemorySize::from_bits(10);
+    /// assert_eq!(size.size_bits_bytes(), (2,1));
+    /// ```
+    pub fn size_bits_bytes(&self) -> (u64, u64) {
+        (self.size_bits % BITS_IN_BYTE, self.size_bits / BITS_IN_BYTE)
+    }
+
     /// Calculates the memory size above or equal to `self` that is aligned to `alignment`
     /// 
     /// i.e returned value is a multiple of alignment
