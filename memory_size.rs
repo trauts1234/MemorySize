@@ -114,7 +114,7 @@ impl MemorySize {
     /// let size = MemorySize::from_bytes(64);
     /// assert_eq!(size.size_bytes(), 64);
     /// ```
-    pub fn size_bytes(&self) -> u64 {
+    pub const fn size_bytes(&self) -> u64 {
         assert!(self.size_bits % BITS_IN_BYTE == 0);
         self.size_bits / BITS_IN_BYTE
     }
@@ -130,7 +130,7 @@ impl MemorySize {
     /// let size = MemorySize::from_bits(256);
     /// assert_eq!(size.size_bits(), 256);
     /// ```
-    pub fn size_bits(&self) -> u64 {
+    pub const fn size_bits(&self) -> u64 {
         self.size_bits
     }
 
@@ -144,7 +144,7 @@ impl MemorySize {
     /// let size = MemorySize::from_bits(10);
     /// assert_eq!(size.size_bits_bytes(), (2,1));
     /// ```
-    pub fn size_bits_bytes(&self) -> (u64, u64) {
+    pub const fn size_bits_bytes(&self) -> (u64, u64) {
         (self.size_bits % BITS_IN_BYTE, self.size_bits / BITS_IN_BYTE)
     }
 
@@ -160,11 +160,11 @@ impl MemorySize {
     /// let size = MemorySize::from_bytes(25);
     /// assert_eq!(size.align_up(MemorySize::from_bytes(4)), MemorySize::from_bytes(28));
     /// ```
-    pub fn align_up(&self, alignment: MemorySize) -> MemorySize {
+    pub const fn align_up(&self, alignment: MemorySize) -> MemorySize {
         //address 0 is aligned to everything
-        if self.size_bits == 0 {return self.clone();}
+        if self.size_bits == 0 {return *self;}
         // alignment 0 = no alignment
-        if alignment.size_bits == 0 {return self.clone();}
+        if alignment.size_bits == 0 {return *self;}
 
         let too_much = self.size_bits + alignment.size_bits - 1;//go above self
         let size_bits = (too_much / alignment.size_bits) * alignment.size_bits;//round down
@@ -183,7 +183,7 @@ impl MemorySize {
     /// let size = MemorySize::from_bits(12);
     /// assert_eq!(size.round_up_byte(), MemorySize::from_bytes(2));
     /// ```
-    pub fn round_up_byte(&self) -> MemorySize {
+    pub const fn round_up_byte(&self) -> MemorySize {
         self.align_up(MemorySize::from_bytes(1))
     }
 

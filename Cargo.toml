@@ -1,6 +1,6 @@
 [package]
 name = "memory_size"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 description = "A crate with the ability to represent a number of bits or bytes, and apply arithmetic to the sizes"
 readme = "README.MD"
