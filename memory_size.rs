@@ -44,7 +44,7 @@ impl MemorySize {
         MemorySize { size_bits: 0 }
     }
     
-    ///Construct a `MemorySize`` from a number of bytes
+    ///Construct a `MemorySize` from a number of bytes
     /// 
     /// # Panics
     /// If the multiplication of bytes by 8 would overflow `u64`
