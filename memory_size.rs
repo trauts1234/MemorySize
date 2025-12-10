@@ -1,4 +1,4 @@
-
+#![cfg_attr(not(feature = "std"), no_std)]
 //! This crate provides the `MemorySize` type, a wrapper around a memory size represented in bits.
 //! It supports basic arithmetic operations and pretty-printing in human-readable formats.
 //!
@@ -13,8 +13,6 @@
 //! ```
 
 mod tests;
-
-use std::fmt::Display;
 
 use derive_more::{Add, Sub, Sum, AddAssign, SubAssign};
 const BITS_IN_BYTE: u64 = 8;
@@ -189,7 +187,8 @@ impl MemorySize {
 
 }
 
-impl Display for MemorySize {
+#[cfg(feature = "std")]
+impl std::fmt::Display for MemorySize {
     
     /// Formats the `MemorySize` in a human-readable way.
     ///

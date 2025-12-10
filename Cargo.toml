@@ -9,8 +9,11 @@ keywords = ["memory-management"]
 license = "GPL-3.0-or-later"
 
 [dependencies]
-derive_more = { version = "2.0.1", features = ["add", "add_assign", "sum"] }
+derive_more = { version = "2.0.1", features = ["add", "add_assign", "sum"], default-features=false }
 
+[features]
+default = ["std"]
+std = []
 
 [lib]
 path = "memory_size.rs"
